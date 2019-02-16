@@ -4,7 +4,7 @@
 Name: Related Post Box
 Author: Nadiar AS -- pabelog.com
 Description: Adds Related Post with Img to Thesis.
-Version: 2.2.5
+Version: 2.3.1
 Class: related_post_box
  */
 
@@ -123,10 +123,39 @@ class related_post_box extends thesis_box
 					'link' => true
 				)
 			),
+			'is_active_ads' => array(
+				'type' => 'checkbox',
+				'label' => __('Activate ads?', 'thesis'),
+				'options' => array(
+					'img1checktext' => __('Click here to activate ads', 'thesis'),
+				),
+				'default' => array(
+					'img1checktext' => false,
+					'html' => ''
+				)
+			),
 			'ads' => array(
 				'type' => 'textarea',
 				'label' => __('Your ads code', 'thesis'),
 				'tooltip' => sprintf(__('The best match is 300x600 ads code', 'thesis')),
+				'code' => true,
+				'default' => ''
+			),
+			'is_active_native_ads' => array(
+				'type' => 'checkbox',
+				'label' => __('Activate native ads?', 'thesis'),
+				'options' => array(
+					'img1checktext' => __('Click here to activate native ads', 'thesis'),
+				),
+				'default' => array(
+					'img1checktext' => false,
+					'html' => ''
+				)
+			),
+			'native_ads' => array(
+				'type' => 'textarea',
+				'label' => __('Your native ads code here', 'thesis'),
+				'tooltip' => sprintf(__('The best match is like related_post_item class', 'thesis')),
 				'code' => true,
 				'default' => ''
 			)
@@ -150,6 +179,9 @@ class related_post_box extends thesis_box
 			$number = !empty($this->options['number']) ? $this->options['number'] : '4';
 			$size = !empty($this->options['size']) ? $this->options['size'] : 'thumbnail';
 			$ads = !empty($this->options['ads']) ? $this->options['ads'] : '';
+			$is_active_ads = !empty($this->options['is_active_ads']) ? $this->options['is_active_ads'] : false;
+			$native_ads = !empty($this->options['native_ads']) ? $this->options['native_ads'] : '';
+			$is_active_native_ads = !empty($this->options['is_active_native_ads']) ? $this->options['is_active_native_ads'] : false;
 			$title_chars = !empty($this->options['characters']) ? $this->options['characters'] : '64';
 			$dom_container_class = !empty($this->options['container_class']) ? $this->options['container_class'] : 'related_posts_containers';
 			$dom_ul_class = !empty($this->options['li_class']) ? $this->options['li_class'] : 'related_posts_list';
@@ -186,15 +218,17 @@ class related_post_box extends thesis_box
 
 			$my_query = new wp_query($args);
 
-			if ($my_query->have_posts()) { ?>
+			if ( $my_query->have_posts() ) { ?>
 
 				<div id="relatedposts">
           <h3 class="related_post_label"><?php echo $title; ?></h3>
 					<div style="width: 100%">
-						<!-- First Column -->
-						<div class="adpad">
-							<?php echo $ads; ?>			
-						</div>
+						<!-- First Column --> <?php
+						if ($is_active_ads) { ?>
+						  <div class="adpad">
+							  <?php echo $ads; ?>			
+						  </div> <?php 
+						} ?>
 						<!-- Second Column Will be related post-->
 						<div class="<?php echo $dom_container_class; ?>">
 						<!-- Related Post Begin -->
@@ -215,16 +249,23 @@ class related_post_box extends thesis_box
 										?>
 										</div>
 										<div class="relatedcontent">
-											<p class="caption aligncenter italic"><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php if (strlen($post->post_title) > $title_chars) {
-																																																																																																																																																													echo substr(the_title($before = '', $after = '', false), 0, $title_chars) . '...';
-																																																																																																																																																												} else {
-																																																																																																																																																													the_title();
-																																																																																																																																																												} ?></a></a></p>
+											<p class="caption aligncenter italic"><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php
+											if (strlen($post->post_title) > $title_chars) {
+											  echo substr(the_title($before = '', $after = '', false), 0, $title_chars) . '...';
+										  } else {
+											  the_title();
+										  } ?></a></p>
 										</div>
 									</li>
 								<?php
 
-						} // end while ?> 
+						} // end while 
+						if ( $is_active_native_ads ) { ?>
+								<li class="<?php echo $dom_li_class; ?>">
+								  <?php echo $native_ads; ?>
+							  </li>
+							<?php 
+					} ?> 					
 							</ul>
 						<!-- Related Post End -->
 						</div>
